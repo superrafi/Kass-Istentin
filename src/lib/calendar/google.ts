@@ -1,16 +1,18 @@
 import { zonedTimeToUtc } from "@/lib/time/zoned";
 import type { CalendarEvent } from "./types";
 
-export const CALENDAR_READ_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
+/** Read and write entries; needed to create and remove blockers. */
+export const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
 /** Private extended property that links a blocker to its coordination process. */
 export const PROCESS_PROPERTY = "kassVorgang";
 
 const EVENTS_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
 // Only what the rules need. The description is read for video links and then dropped.
-const FIELDS =
-  "nextPageToken,items(id,status,summary,description,location,start,end,transparency,eventType," +
+const EVENT_FIELDS =
+  "id,status,summary,description,location,start,end,transparency,eventType," +
   "hangoutLink,conferenceData(entryPoints(entryPointType)),attendees(self,responseStatus,optional)," +
-  "extendedProperties(private),workingLocationProperties(type))";
+  "extendedProperties(private),workingLocationProperties(type)";
+const FIELDS = `nextPageToken,items(${EVENT_FIELDS})`;
 const MAX_PAGES = 10;
 const VIDEO_LINK =
   /https?:\/\/[^\s"'<>]*(teams\.microsoft\.com|teams\.live\.com|zoom\.us|meet\.google\.com|webex\.com|whereby\.com)/i;
@@ -145,4 +147,90 @@ export async function listEvents(
   }
   // Better no answer than one based on half a calendar.
   throw new CalendarAccessError("unavailable");
+}
+
+export interface NewBlocker {
+  title: string;
+  start: Date;
+  end: Date;
+  processId: string;
+  description: string;
+}
+
+async function call(
+  accessToken: string,
+  url: URL | string,
+  init: RequestInit,
+  fetchImpl: typeof fetch,
+): Promise<Response> {
+  try {
+    return await fetchImpl(url, {
+      ...init,
+      headers: { Authorization: `Bearer ${accessToken}`, ...init.headers },
+    });
+  } catch {
+    throw new CalendarAccessError("unavailable");
+  }
+}
+
+/** Creates a blocker in the primary calendar and returns its id. */
+export async function insertBlocker(
+  accessToken: string,
+  blocker: NewBlocker,
+  fetchImpl: typeof fetch = fetch,
+): Promise<string> {
+  const response = await call(
+    accessToken,
+    `${EVENTS_URL}?fields=id`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        summary: blocker.title,
+        description: blocker.description,
+        start: { dateTime: blocker.start.toISOString() },
+        end: { dateTime: blocker.end.toISOString() },
+        transparency: "opaque",
+        reminders: { useDefault: false },
+        extendedProperties: { private: { [PROCESS_PROPERTY]: blocker.processId } },
+      }),
+    },
+    fetchImpl,
+  );
+  if (!response.ok) throw new CalendarAccessError(await problemOf(response));
+  const body = (await response.json()) as { id?: string };
+  if (!body.id) throw new CalendarAccessError("unavailable");
+  return body.id;
+}
+
+/** Loads one entry; null if it does not exist (any more). */
+export async function getEvent(
+  accessToken: string,
+  eventId: string,
+  timeZone: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<CalendarEvent | null> {
+  const url = new URL(`${EVENTS_URL}/${encodeURIComponent(eventId)}`);
+  url.searchParams.set("fields", EVENT_FIELDS);
+  const response = await call(accessToken, url, {}, fetchImpl);
+  if (response.status === 404 || response.status === 410) return null;
+  if (!response.ok) throw new CalendarAccessError(await problemOf(response));
+  const event = normalizeEvent((await response.json()) as GoogleEvent, timeZone);
+  return event && !event.cancelled ? event : null;
+}
+
+/** Deletes one entry. An entry that is already gone counts as deleted. */
+export async function deleteEvent(
+  accessToken: string,
+  eventId: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<void> {
+  const response = await call(
+    accessToken,
+    `${EVENTS_URL}/${encodeURIComponent(eventId)}?sendUpdates=none`,
+    { method: "DELETE" },
+    fetchImpl,
+  );
+  if (response.ok || response.status === 404 || response.status === 410) return;
+  throw new CalendarAccessError(await problemOf(response));
 }

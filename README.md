@@ -2,7 +2,7 @@
 
 Eine Assistentin für organisatorische Aufgaben rund um Kalender und Mail. Sie wird mit Google Calendar und Gmail eines Google-Workspace-Kontos verbunden und übernimmt Terminkoordination: freie Slots suchen, Blocker für Terminumfragen eintragen und wieder aufräumen, Antworten auf Terminanfragen entwerfen.
 
-**Stand:** Die Schritte 1 und 2 von Etappe 1 sind gebaut: Login mit Google, Chat und die Slot-Suche im Kalender nach den Regeln der Person. Die App läuft auf Cloud Run. Sie liest den Kalender, ändert aber nichts daran und greift noch nicht auf Mail zu. Der Chat antwortet mit einem Platzhalter, bis ein Schlüssel für die Claude-API hinterlegt ist. Die Einrichtung steht in [docs/einrichtung.md](docs/einrichtung.md).
+**Stand:** Die Schritte 1 bis 3 von Etappe 1 sind gebaut: Login mit Google, Chat, Slot-Suche im Kalender und Terminumfragen (Slots aus Text oder Bild prüfen, Blocker eintragen und wieder aufräumen). In den Kalender schreibt die App nur, wenn die Person einen angezeigten Vorschlag bestätigt. Auf Mail greift sie noch nicht zu. Die App läuft auf Cloud Run. Der Chat antwortet mit einem Platzhalter, bis ein Schlüssel für die Claude-API hinterlegt ist. Die Einrichtung steht in [docs/einrichtung.md](docs/einrichtung.md).
 
 Die Abläufe wurden mit den Claude-Konnektoren für Google Calendar und Gmail an echten Fällen ausprobiert. Die Ergebnisse stehen in [docs/regeln.md](docs/regeln.md).
 
@@ -39,13 +39,13 @@ Die Abläufe wurden mit den Claude-Konnektoren für Google Calendar und Gmail an
 
 ## Technik
 
-Der Vorschlag ist bestätigt. Gebaut sind bisher App, Anmeldung und Kalender lesen. Der Chat spricht mit Claude, sobald ein API-Schlüssel gesetzt ist.
+Der Vorschlag ist bestätigt. Gebaut sind bisher App, Anmeldung, Kalender lesen und Blocker schreiben. Der Chat spricht mit Claude, sobald ein API-Schlüssel gesetzt ist.
 
 | Baustein | Entscheid |
 |---|---|
 | App | eine Web-App in TypeScript (Next.js) auf Cloud Run, Region Zürich (`europe-west6`) |
 | Anmeldung | Google-Login (OAuth) mit Auth.js, als interne Workspace-App; zusätzlich prüft die App Domain und optional eine Liste erlaubter Adressen |
-| Daten | Firestore für Regeln, Vorgänge und Orte; Google-Zugriffe (Refresh-Tokens) verschlüsselt im Secret Manager. Noch nicht gebaut: Bis dahin liegen die Google-Zugriffe nur im verschlüsselten Sitzungs-Cookie, und die Regeln sind Startwerte im Code. |
+| Daten | Firestore für Regeln, Vorgänge und Orte; Google-Zugriffe (Refresh-Tokens) verschlüsselt im Secret Manager. Noch nicht gebaut: Bis dahin liegen die Google-Zugriffe nur im verschlüsselten Sitzungs-Cookie, die Regeln sind Startwerte im Code, und ein Vorgang besteht nur aus seinen Blockern im Kalender. |
 | Sprachmodell | Claude über die API, mit Kalender und Mail als Werkzeugen |
 | Reisezeit | Google Maps Routes API mit ÖV |
 | Neue Mails (Etappe 3) | Gmail-Benachrichtigungen über Pub/Sub |
@@ -60,14 +60,17 @@ Blocker, die die Assistentin anlegt, markiert sie im Kalendereintrag mit der Ken
 |---|---|
 | `src/auth.ts` | Google-Login |
 | `src/lib/access.ts` | wer sich anmelden darf |
-| `src/lib/chat/` | Prüfung der Chat-Anfrage, Antwort des Sprachmodells und die Slot-Suche als Werkzeug |
+| `src/lib/chat/` | Prüfung der Chat-Anfrage, Antwort des Sprachmodells und seine Werkzeuge |
+| `src/lib/polls/` | Slots einer Umfrage gegen den Kalender prüfen |
+| `src/lib/processes/` | Vorgänge und ihre Blocker |
+| `src/lib/proposals/` | Vorschläge für Kalenderänderungen: signieren, prüfen, nach Bestätigung ausführen |
 | `src/lib/rules/` | Regeln der Person und die Einstufung eines Kalendereintrags (besetzt, verschiebbar, Homeoffice, frei) |
 | `src/lib/slots/` | Slot-Suche und Aufbereitung des Ergebnisses |
-| `src/lib/calendar/` | Kalender lesen über die Google Calendar API |
+| `src/lib/calendar/` | Kalender lesen und Blocker schreiben über die Google Calendar API |
 | `src/lib/google/` | Google-Zugriff erneuern |
 | `src/lib/time/` | Rechnen mit Ortszeit und Sommerzeit |
-| `src/app/` | Seiten und Schnittstellen (`/`, `/login`, `/api/chat`, `/api/slots`, `/api/health`) |
-| `src/components/Chat.tsx` | Chat-Oberfläche |
+| `src/app/` | Seiten und Schnittstellen (`/`, `/login`, `/api/chat`, `/api/slots`, `/api/proposals/confirm`, `/api/health`) |
+| `src/components/` | Chat-Oberfläche und Vorschlagskarte |
 | `Dockerfile` | Image für Cloud Run |
 
 Der Chat-Verlauf lebt bisher nur im Browser und geht beim Neuladen verloren. Gespeichert wird erst mit den Vorgängen in Firestore.

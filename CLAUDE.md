@@ -2,7 +2,7 @@
 
 ## Einstieg
 
-Lies zuerst [README.md](README.md) (Ziel, Etappen, Technik), [docs/regeln.md](docs/regeln.md) (Regeln und Testergebnisse) und [docs/einrichtung.md](docs/einrichtung.md) (lokaler Start und Bereitstellung). Die Schritte 1 (Gerüst) und 2 (Kalender lesen, Slot-Suche) von Etappe 1 sind gebaut. Die App läuft auf Cloud Run, noch ohne Schlüssel für die Claude-API. Der nächste Schritt ist Schritt 3: Umfragen.
+Lies zuerst [README.md](README.md) (Ziel, Etappen, Technik), [docs/regeln.md](docs/regeln.md) (Regeln und Testergebnisse) und [docs/einrichtung.md](docs/einrichtung.md) (lokaler Start und Bereitstellung). Die Schritte 1 (Gerüst), 2 (Kalender lesen, Slot-Suche) und 3 (Umfragen, Blocker, Vorgänge) von Etappe 1 sind gebaut. Die App läuft auf Cloud Run, noch ohne Schlüssel für die Claude-API. Der nächste Schritt ist Schritt 4: Reisezeit.
 
 Vor jedem Commit: `npm run typecheck`, `npm test` und `npm run build`.
 
@@ -28,4 +28,5 @@ Vor jedem Commit: `npm run typecheck`, `npm test` und `npm run build`.
 
 - Die Slot-Suche und alle Regeln sind normaler, getesteter Code. Das Sprachmodell entscheidet nicht, ob eine Zeit frei ist.
 - Jede Regel aus `docs/regeln.md` bekommt mindestens einen Test.
+- Das Sprachmodell bekommt kein Werkzeug, das in Kalender oder Mail schreibt. Schreibende Werkzeuge zeigen nur einen Vorschlag an. Ausgeführt wird er über `/api/proposals/confirm`, nachdem die Person ihn bestätigt hat.
 - Neue Regeln oder Erkenntnisse aus Gesprächen trägst du in `docs/regeln.md` nach.

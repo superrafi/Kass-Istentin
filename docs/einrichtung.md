@@ -55,7 +55,7 @@ gcloud projects describe PROJEKT_ID --format='value(projectNumber)'
 
 Client-ID und Client-Secret trägst Du lokal in `.env.local` ein (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`), dazu die Domain in `ALLOWED_GOOGLE_DOMAIN`. Für den Anfang mit einer Person setzt Du zusätzlich `ALLOWED_EMAILS` auf Deine Adresse.
 
-Die App fragt bei der Anmeldung Name, Mailadresse und das Leserecht für den Kalender ab, siehe Schritt 8. Rechte für Mail kommen in Etappe 2 dazu.
+Die App fragt bei der Anmeldung Name, Mailadresse und den Zugriff auf die Kalendertermine ab, siehe Schritt 8. Rechte für Mail kommen in Etappe 2 dazu.
 
 ## 4. Secrets ablegen
 
@@ -123,9 +123,9 @@ Meldet Google `redirect_uri_mismatch`, stimmt die Weiterleitungs-URI im OAuth-Cl
 gcloud run services describe kass-istentin --region europe-west6 --format='value(status.url)'
 ```
 
-## 8. Kalender lesen
+## 8. Kalender lesen und Blocker schreiben
 
-Die Slot-Suche braucht das Leserecht für den Kalender. Dafür sind drei Dinge nötig.
+Die Slot-Suche liest den Kalender, und Blocker für Umfragen werden nach Bestätigung eingetragen und gelöscht. Dafür sind drei Dinge nötig.
 
 Die Calendar API im Projekt einschalten:
 
@@ -133,7 +133,7 @@ Die Calendar API im Projekt einschalten:
 gcloud services enable calendar-json.googleapis.com
 ```
 
-In der Cloud Console unter **Google Auth Platform → Datenzugriff** den Bereich `https://www.googleapis.com/auth/calendar.readonly` hinzufügen und speichern.
+In der Cloud Console unter **Google Auth Platform → Datenzugriff** den Bereich `https://www.googleapis.com/auth/calendar.events` hinzufügen und speichern.
 
 Die App neu bereitstellen. Umgebungsvariablen und Secrets bleiben erhalten:
 
@@ -141,7 +141,7 @@ Die App neu bereitstellen. Umgebungsvariablen und Secrets bleiben erhalten:
 gcloud run deploy kass-istentin --source . --region europe-west6
 ```
 
-Danach einmal abmelden und neu anmelden. Google fragt dabei nach dem Zugriff auf den Kalender. Ohne neue Anmeldung meldet die Slot-Suche «nicht verbunden».
+Danach einmal abmelden und neu anmelden. Google fragt dabei nach dem Zugriff auf die Kalendertermine. Ohne neue Anmeldung meldet die App «nicht verbunden».
 
 Die Slot-Suche lässt sich ohne Sprachmodell prüfen, angemeldet im Browser:
 
@@ -150,6 +150,8 @@ https://kass-istentin-PROJEKTNUMMER.europe-west6.run.app/api/slots?from=2026-11-
 ```
 
 Weitere Angaben: `mode=onsite` für Termine vor Ort, `latest=17:00` für die späteste Endzeit.
+
+Umfragen prüfen und Blocker eintragen geht nur über den Chat und braucht den Schlüssel für die Claude-API.
 
 ## Einstellungen
 

@@ -34,6 +34,22 @@ Diese Punkte hat der Bau der Slot-Suche festgelegt. Sie sind noch nicht an echte
 | Verteilung | zuerst ein Vorschlag pro Tag in Datumsreihenfolge, erst danach ein zweiter am selben Tag |
 | Standup und vorläufig zugesagte, freiwillige Termine | werden nur überlagert, wenn sonst nichts frei ist; der Vorschlag nennt den überlagerten Termin |
 
+### Annahmen zu Umfragen und Blockern
+
+Auch diese Punkte hat der Bau festgelegt, sie sind noch nicht an echten Fällen geprüft.
+
+| Fall | Annahme |
+|---|---|
+| Befund «besetzt» | Der Slot überschneidet sich mit einem besetzten Eintrag, liegt in der Vergangenheit oder ist ein Termin vor Ort während Homeoffice |
+| Befund «unsicher» | Der Slot überlagert einen Standup oder einen vorläufig zugesagten, freiwilligen Termin; oder weniger als 60 Minuten davor oder danach liegt ein Termin mit Ortsangabe; oder er liegt ausserhalb von Montag bis Freitag, 08:00 bis 18:00 Uhr |
+| Blocker vorschlagen | nur für freie und unsichere Slots; besetzte und schon geblockte fallen weg |
+| Titel der Blocker | «Blocker» plus Name des Vorgangs, als «beschäftigt» markiert, ohne Erinnerung |
+| Zuordnung zum Vorgang | über die Kennung im Kalendereintrag; von Hand angelegte Einträge mit «Blocker» im Titel bilden pro Titel einen Vorgang |
+| Offene Vorgänge | alle Blocker der nächsten 180 Tage |
+| Aufräumen | Der Blocker des bestätigten Termins bleibt stehen, die übrigen werden zum Löschen vorgeschlagen |
+| Löschen | nur Einträge, die noch Blocker sind und seit dem Vorschlag nicht verschoben wurden |
+| OK der Person | Schaltfläche am Vorschlag; ein «ja» im Chat schreibt nichts. Ein Vorschlag gilt 30 Minuten und nur für die Person, für die er erstellt wurde |
+
 ### Vor Ort oder online?
 
 1. Hat ein Termin keinen Ort, aber einen Videocall-Link, ist er online.
@@ -115,6 +131,8 @@ Erkenntnis: Die Kandidaten standen schon als benannte Blocker im Kalender. Die A
 - **Erinnerungen:** Ein Vorgang kennt seinen nächsten Schritt und ein Datum dafür.
 - **Grosse Antworten:** Kalender- und Mailabfragen liefern schnell sehr viel Text (HTML, Zitate, Signaturen). Vor der Übergabe ans Modell kürzen: nur Klartext, zitierte Verläufe abschneiden.
 - **Suche in Gmail:** Ein Treffer in der Suche zeigt nicht die neueste Nachricht. Den Verlauf immer ganz laden, bevor der Stand beurteilt wird.
+- **OK im Code, nicht im Modell:** Das Sprachmodell hat kein Werkzeug, das in den Kalender schreibt. Es kann nur einen Vorschlag anzeigen lassen. Geschrieben wird allein über die Bestätigung der Person, und der Server führt nur Vorschläge aus, die er selbst signiert hat.
+- **Vorgänge ohne Datenbank:** Ein Vorgang besteht bisher nur aus seinen Blockern im Kalender. Nächster Schritt und Erinnerungsdatum brauchen eine eigene Ablage (Firestore).
 - **Halber Kalender:** Lässt sich der Kalender für den Suchzeitraum nicht vollständig laden, gibt die Slot-Suche einen Fehler zurück statt Vorschlägen.
 
 ## Stand der Umsetzung
@@ -125,4 +143,7 @@ Erkenntnis: Die Kandidaten standen schon als benannte Blocker im Kalender. Die A
 | Vor Ort oder online, Regel 1 (kein Ort, aber Videolink) | `src/lib/calendar/google.ts`, `src/lib/slots/search.ts` | gebaut und getestet |
 | Vor Ort oder online, Regeln 2 und 3 | | offen, kommt mit Schritt 4 |
 | Ort erkennen, Reisezeit | | offen, kommt mit Schritt 4 |
-| Schreiben, Ton der Mails | | offen, kommt mit Schritt 3 und Etappe 2 |
+| Eigene Blocker für denselben Vorgang: kein Konflikt, keine Doppelten | `src/lib/polls/check.ts`, `src/lib/processes/blockers.ts`, `src/lib/proposals/execute.ts` | gebaut und getestet |
+| Ablauf Terminumfrage (Slots prüfen, Befund, Blocker nach OK, aufräumen) | `src/lib/polls/`, `src/lib/processes/`, `src/lib/chat/tools.ts` | gebaut und getestet; Slots aus dem Bild liest das Sprachmodell |
+| Schreiben: Kalendereinträge erst nach OK | `src/lib/proposals/`, `src/app/api/proposals/confirm` | gebaut und getestet |
+| Schreiben: Mails nur als Entwurf; Ton der Mails | | offen, kommt mit Etappe 2 |

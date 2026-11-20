@@ -1,5 +1,5 @@
 import { getToken } from "next-auth/jwt";
-import { CALENDAR_READ_SCOPE } from "@/lib/calendar/google";
+import { CALENDAR_SCOPE } from "@/lib/calendar/google";
 
 /** Google credentials as they are kept in the encrypted session cookie. */
 export interface StoredGoogleTokens {
@@ -20,7 +20,7 @@ const EXPIRY_MARGIN_SECONDS = 60;
 const refreshed = new Map<string, { accessToken: string; expiresAt: number }>();
 
 export function hasCalendarScope(tokens: StoredGoogleTokens | undefined): boolean {
-  return Boolean(tokens?.scope?.split(" ").includes(CALENDAR_READ_SCOPE));
+  return Boolean(tokens?.scope?.split(" ").includes(CALENDAR_SCOPE));
 }
 
 function isFresh(expiresAt: number | undefined, now: Date): boolean {

@@ -17,6 +17,11 @@ export interface PersonRules {
   movableKeywords: string[];
   /** Title parts of home-office entries. */
   homeOfficeKeywords: string[];
+  /**
+   * An entry at another place this close before or after a slot makes the
+   * slot uncertain, because travel is not calculated yet.
+   */
+  travelWarningMinutes: number;
 }
 
 export const DEFAULT_RULES: PersonRules = {
@@ -28,4 +33,5 @@ export const DEFAULT_RULES: PersonRules = {
   busyKeywords: ["Evt.", "Blocker", "Reserve"],
   movableKeywords: ["Standup"],
   homeOfficeKeywords: ["Homeoffice", "@Home"],
+  travelWarningMinutes: 60,
 };

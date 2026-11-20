@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { isAllowedUser, readAccessConfig } from "@/lib/access";
-import { CALENDAR_READ_SCOPE } from "@/lib/calendar/google";
+import { CALENDAR_SCOPE } from "@/lib/calendar/google";
 import type { StoredGoogleTokens } from "@/lib/google/token";
 
 const access = readAccessConfig(process.env);
@@ -13,7 +13,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         params: {
           // Only a hint for the account chooser; the real check is in signIn below.
           ...(access.allowedDomain ? { hd: access.allowedDomain } : {}),
-          scope: `openid email profile ${CALENDAR_READ_SCOPE}`,
+          scope: `openid email profile ${CALENDAR_SCOPE}`,
           // Offline access plus consent make Google hand out a refresh token on every sign-in.
           access_type: "offline",
           prompt: "consent select_account",

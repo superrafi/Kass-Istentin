@@ -87,12 +87,12 @@ export interface SlotSearchResult {
   days: DayReport[];
 }
 
-interface Interval {
+export interface Interval {
   start: number;
   end: number;
 }
 
-interface Classified {
+export interface Classified {
   event: CalendarEvent;
   classification: Classification;
 }
@@ -113,11 +113,11 @@ interface DayPlan {
   chosen: Candidate[];
 }
 
-function overlapsInterval(event: CalendarEvent, interval: Interval): boolean {
+export function overlapsInterval(event: CalendarEvent, interval: Interval): boolean {
   return event.start.getTime() < interval.end && event.end.getTime() > interval.start;
 }
 
-function note({ event, classification }: Classified): EventNote {
+export function note({ event, classification }: Classified): EventNote {
   return {
     title: event.title,
     start: event.start,

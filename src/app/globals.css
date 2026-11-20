@@ -191,3 +191,93 @@ button.quiet {
 .login p {
   margin: 0;
 }
+
+.message img {
+  display: block;
+  max-width: 100%;
+  max-height: 260px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.proposal {
+  white-space: normal;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.proposal h2 {
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+
+.proposal ul {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.proposal li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 8px;
+}
+
+.outcome {
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+
+.outcome.failed,
+.outcome.refused {
+  color: var(--alert);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attachments {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.attachments li {
+  position: relative;
+}
+
+.attachments img {
+  display: block;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.attachments button {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--surface);
+  line-height: 1.4;
+}

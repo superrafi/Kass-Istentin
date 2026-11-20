@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { CALENDAR_READ_SCOPE } from "@/lib/calendar/google";
+import { CALENDAR_SCOPE } from "@/lib/calendar/google";
 import { hasCalendarScope, refreshAccessToken, resolveAccessToken } from "./token";
 
 const NOW = new Date("2026-11-23T08:00:00Z");
 const nowSeconds = NOW.getTime() / 1000;
-const scope = `openid email ${CALENDAR_READ_SCOPE}`;
+const scope = `openid email ${CALENDAR_SCOPE}`;
 const noRefresh = vi.fn(async () => null);
 
 describe("hasCalendarScope", () => {
