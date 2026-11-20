@@ -55,7 +55,7 @@ gcloud projects describe PROJEKT_ID --format='value(projectNumber)'
 
 Client-ID und Client-Secret trägst Du lokal in `.env.local` ein (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`), dazu die Domain in `ALLOWED_GOOGLE_DOMAIN`. Für den Anfang mit einer Person setzt Du zusätzlich `ALLOWED_EMAILS` auf Deine Adresse.
 
-Rechte für Kalender und Mail kommen erst in Schritt 2 von Etappe 1 dazu. Bis dahin fragt die App nur Name und Mailadresse ab.
+Die App fragt bei der Anmeldung Name, Mailadresse und das Leserecht für den Kalender ab, siehe Schritt 8. Rechte für Mail kommen in Etappe 2 dazu.
 
 ## 4. Secrets ablegen
 
@@ -122,6 +122,34 @@ Meldet Google `redirect_uri_mismatch`, stimmt die Weiterleitungs-URI im OAuth-Cl
 ```bash
 gcloud run services describe kass-istentin --region europe-west6 --format='value(status.url)'
 ```
+
+## 8. Kalender lesen
+
+Die Slot-Suche braucht das Leserecht für den Kalender. Dafür sind drei Dinge nötig.
+
+Die Calendar API im Projekt einschalten:
+
+```bash
+gcloud services enable calendar-json.googleapis.com
+```
+
+In der Cloud Console unter **Google Auth Platform → Datenzugriff** den Bereich `https://www.googleapis.com/auth/calendar.readonly` hinzufügen und speichern.
+
+Die App neu bereitstellen. Umgebungsvariablen und Secrets bleiben erhalten:
+
+```bash
+gcloud run deploy kass-istentin --source . --region europe-west6
+```
+
+Danach einmal abmelden und neu anmelden. Google fragt dabei nach dem Zugriff auf den Kalender. Ohne neue Anmeldung meldet die Slot-Suche «nicht verbunden».
+
+Die Slot-Suche lässt sich ohne Sprachmodell prüfen, angemeldet im Browser:
+
+```
+https://kass-istentin-PROJEKTNUMMER.europe-west6.run.app/api/slots?from=2026-11-23&to=2026-11-27&duration=45&count=3&earliest=09:00&avoidLunch=1
+```
+
+Weitere Angaben: `mode=onsite` für Termine vor Ort, `latest=17:00` für die späteste Endzeit.
 
 ## Einstellungen
 

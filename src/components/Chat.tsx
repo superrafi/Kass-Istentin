@@ -74,8 +74,9 @@ export function Chat() {
       <div className="messages" aria-live="polite">
         {messages.length === 0 ? (
           <p className="empty">
-            Schreib mir, was Du koordinieren möchtest. Auf Kalender und Mail greife ich noch
-            nicht zu, das kommt im nächsten Schritt.
+            Frag mich nach freien Zeiten, zum Beispiel: «Drei freie Slots à 45 Minuten nächste
+            Woche, nicht vor 9 Uhr, nicht über Mittag.» Ich lese Deinen Kalender, ändere aber
+            nichts daran.
           </p>
         ) : (
           messages.map((message, index) => (
