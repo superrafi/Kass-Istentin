@@ -2,7 +2,7 @@
 
 ## Einstieg
 
-Lies zuerst [README.md](README.md) (Ziel, Etappen, Technik), [docs/regeln.md](docs/regeln.md) (Regeln und Testergebnisse) und [docs/einrichtung.md](docs/einrichtung.md) (lokaler Start und Bereitstellung). Schritt 1 von Etappe 1 (Gerüst) ist gebaut und läuft auf Cloud Run, noch ohne Schlüssel für die Claude-API. Der nächste Schritt ist Schritt 2: Kalender lesen und Slot-Suche.
+Lies zuerst [README.md](README.md) (Ziel, Etappen, Technik), [docs/regeln.md](docs/regeln.md) (Regeln und Testergebnisse) und [docs/einrichtung.md](docs/einrichtung.md) (lokaler Start und Bereitstellung). Die Schritte 1 (Gerüst) und 2 (Kalender lesen, Slot-Suche) von Etappe 1 sind gebaut. Die App läuft auf Cloud Run, noch ohne Schlüssel für die Claude-API. Der nächste Schritt ist Schritt 3: Umfragen.
 
 Vor jedem Commit: `npm run typecheck`, `npm test` und `npm run build`.
 

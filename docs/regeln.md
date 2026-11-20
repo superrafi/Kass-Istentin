@@ -14,6 +14,26 @@ Diese Regeln stammen aus Tests an echten Fällen der ersten Nutzerin oder des er
 | Vorläufig zugesagte, freiwillige Termine | nicht hart besetzt, aber im Befund erwähnen |
 | Eigene Blocker für denselben Vorgang | nicht als Konflikt melden und keine Doppelten anlegen |
 
+### Annahmen der Slot-Suche
+
+Diese Punkte hat der Bau der Slot-Suche festgelegt. Sie sind noch nicht an echten Fällen geprüft und pro Person anpassbar.
+
+| Fall | Annahme |
+|---|---|
+| Abgesagte oder von der Person abgelehnte Termine | frei |
+| Eigener Blocker desselben Vorgangs | frei, unabhängig vom Titel |
+| Im Kalender als «frei» markierte Einträge | frei, ausser der Titel enthält «Evt.», «Blocker» oder «Reserve» |
+| Ganztägige Einträge | besetzt nur, wenn sie als «beschäftigt» markiert sind (zum Beispiel Ferien) |
+| Abwesenheitseinträge («Out of office») | besetzt |
+| Unbeantwortete Einladungen | besetzt |
+| Vorläufig zugesagt, aber nicht freiwillig | besetzt |
+| Arbeitsort «Zuhause» im Kalender | gilt als Homeoffice-Eintrag |
+| Homeoffice-Eintrag über einen Teil des Tages | Termine vor Ort sind nur in diesem Teil nicht möglich |
+| Suchfenster | Montag bis Freitag, 08:00 bis 18:00 Uhr; Mittag ist 12:00 bis 13:00 Uhr und wird nur auf Wunsch ausgespart |
+| Raster | Vorschläge beginnen zur Viertelstunde und nie in der Vergangenheit |
+| Verteilung | zuerst ein Vorschlag pro Tag in Datumsreihenfolge, erst danach ein zweiter am selben Tag |
+| Standup und vorläufig zugesagte, freiwillige Termine | werden nur überlagert, wenn sonst nichts frei ist; der Vorschlag nennt den überlagerten Termin |
+
 ### Vor Ort oder online?
 
 1. Hat ein Termin keinen Ort, aber einen Videocall-Link, ist er online.
@@ -95,3 +115,14 @@ Erkenntnis: Die Kandidaten standen schon als benannte Blocker im Kalender. Die A
 - **Erinnerungen:** Ein Vorgang kennt seinen nächsten Schritt und ein Datum dafür.
 - **Grosse Antworten:** Kalender- und Mailabfragen liefern schnell sehr viel Text (HTML, Zitate, Signaturen). Vor der Übergabe ans Modell kürzen: nur Klartext, zitierte Verläufe abschneiden.
 - **Suche in Gmail:** Ein Treffer in der Suche zeigt nicht die neueste Nachricht. Den Verlauf immer ganz laden, bevor der Stand beurteilt wird.
+- **Halber Kalender:** Lässt sich der Kalender für den Suchzeitraum nicht vollständig laden, gibt die Slot-Suche einen Fehler zurück statt Vorschlägen.
+
+## Stand der Umsetzung
+
+| Regel | Code | Stand |
+|---|---|---|
+| Wann ist eine Zeit besetzt? | `src/lib/rules/classify.ts`, `src/lib/slots/search.ts` | gebaut und getestet |
+| Vor Ort oder online, Regel 1 (kein Ort, aber Videolink) | `src/lib/calendar/google.ts`, `src/lib/slots/search.ts` | gebaut und getestet |
+| Vor Ort oder online, Regeln 2 und 3 | | offen, kommt mit Schritt 4 |
+| Ort erkennen, Reisezeit | | offen, kommt mit Schritt 4 |
+| Schreiben, Ton der Mails | | offen, kommt mit Schritt 3 und Etappe 2 |
