@@ -2,7 +2,9 @@
 
 Eine Assistentin für organisatorische Aufgaben rund um Kalender und Mail. Sie wird mit Google Calendar und Gmail eines Google-Workspace-Kontos verbunden und übernimmt Terminkoordination: freie Slots suchen, Blocker für Terminumfragen eintragen und wieder aufräumen, Antworten auf Terminanfragen entwerfen.
 
-**Stand:** Planung abgeschlossen, noch kein Code. Die Abläufe wurden mit den Claude-Konnektoren für Google Calendar und Gmail an echten Fällen ausprobiert. Die Ergebnisse stehen in [docs/regeln.md](docs/regeln.md).
+**Stand:** Schritt 1 von Etappe 1 ist gebaut: Login mit Google, Chat-Oberfläche und die Vorbereitung für Cloud Run. Die App läuft auf Cloud Run, der Google-Login ist geprüft. Sie greift noch nicht auf Kalender oder Mail zu, und der Chat antwortet mit einem Platzhalter, bis ein Schlüssel für die Claude-API hinterlegt ist. Die Einrichtung steht in [docs/einrichtung.md](docs/einrichtung.md).
+
+Die Abläufe wurden mit den Claude-Konnektoren für Google Calendar und Gmail an echten Fällen ausprobiert. Die Ergebnisse stehen in [docs/regeln.md](docs/regeln.md).
 
 ## Rahmen
 
@@ -35,12 +37,14 @@ Eine Assistentin für organisatorische Aufgaben rund um Kalender und Mail. Sie w
 3. **Umfragen:** Slots aus Screenshot oder Text lesen, Blocker nach OK eintragen, Vorgang anlegen und später aufräumen.
 4. **Reisezeit:** Orte erkennen, Reise einrechnen und als Kalendereintrag vorschlagen.
 
-## Technik (Vorschlag, noch nicht bestätigt)
+## Technik
 
-| Baustein | Vorschlag |
+Der Vorschlag ist bestätigt. Gebaut sind bisher App und Anmeldung, der Chat spricht mit Claude, sobald ein API-Schlüssel gesetzt ist.
+
+| Baustein | Entscheid |
 |---|---|
 | App | eine Web-App in TypeScript (Next.js) auf Cloud Run, Region Zürich (`europe-west6`) |
-| Anmeldung | Google-Login (OAuth), als interne Workspace-App |
+| Anmeldung | Google-Login (OAuth) mit Auth.js, als interne Workspace-App; zusätzlich prüft die App Domain und optional eine Liste erlaubter Adressen |
 | Daten | Firestore für Regeln, Vorgänge und Orte; Google-Zugriffe (Refresh-Tokens) verschlüsselt im Secret Manager |
 | Sprachmodell | Claude über die API, mit Kalender und Mail als Werkzeugen |
 | Reisezeit | Google Maps Routes API mit ÖV |
@@ -50,9 +54,29 @@ Die Slot-Suche rechnet normaler Code nach den Regeln, nicht das Sprachmodell. Da
 
 Blocker, die die Assistentin anlegt, markiert sie im Kalendereintrag mit der Kennung des Vorgangs (erweiterte Eigenschaften des Eintrags), damit sie sie sicher wiederfindet.
 
+## Aufbau
+
+| Pfad | Inhalt |
+|---|---|
+| `src/auth.ts` | Google-Login |
+| `src/lib/access.ts` | wer sich anmelden darf |
+| `src/lib/chat/` | Prüfung der Chat-Anfrage und Antwort des Sprachmodells |
+| `src/app/` | Seiten und Schnittstellen (`/`, `/login`, `/api/chat`, `/api/health`) |
+| `src/components/Chat.tsx` | Chat-Oberfläche |
+| `Dockerfile` | Image für Cloud Run |
+
+Der Chat-Verlauf lebt bisher nur im Browser und geht beim Neuladen verloren. Gespeichert wird erst mit den Vorgängen in Firestore.
+
+```bash
+npm install
+npm run dev
+```
+
+```bash
+npm test
+```
+
 ## Offen
 
-- Bestätigung des Technik-Vorschlags.
-- GCP-Projekt in der Cloud-Organisation, darin die Anmeldung als interne App einrichten.
 - Schlüssel für die Claude-API und für Google Maps.
 - Startwerte für die Liste bekannter Orte. Sie gehören in die Datenbank, nicht in dieses Repository.

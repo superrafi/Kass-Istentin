@@ -2,7 +2,9 @@
 
 ## Einstieg
 
-Lies zuerst [README.md](README.md) (Ziel, Etappen, Technik-Vorschlag) und [docs/regeln.md](docs/regeln.md) (Regeln und Testergebnisse). Der nächste Schritt ist Schritt 1 von Etappe 1: das Gerüst mit Login, Chat-Oberfläche und Bereitstellung. Der Technik-Vorschlag ist noch nicht bestätigt, frag vor dem ersten Code nach.
+Lies zuerst [README.md](README.md) (Ziel, Etappen, Technik), [docs/regeln.md](docs/regeln.md) (Regeln und Testergebnisse) und [docs/einrichtung.md](docs/einrichtung.md) (lokaler Start und Bereitstellung). Schritt 1 von Etappe 1 (Gerüst) ist gebaut und läuft auf Cloud Run, noch ohne Schlüssel für die Claude-API. Der nächste Schritt ist Schritt 2: Kalender lesen und Slot-Suche.
+
+Vor jedem Commit: `npm run typecheck`, `npm test` und `npm run build`.
 
 ## Sprache
 
