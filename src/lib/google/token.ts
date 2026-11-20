@@ -1,5 +1,5 @@
 import { getToken } from "next-auth/jwt";
-import { CALENDAR_READ_SCOPE } from "@/lib/calendar/google";
+import { CALENDAR_SCOPE } from "@/lib/calendar/google";
 
 /** Google credentials as they are kept in the encrypted session cookie. */
 export interface StoredGoogleTokens {
@@ -20,7 +20,7 @@ const EXPIRY_MARGIN_SECONDS = 60;
 const refreshed = new Map<string, { accessToken: string; expiresAt: number }>();
 
 export function hasCalendarScope(tokens: StoredGoogleTokens | undefined): boolean {
-  return Boolean(tokens?.scope?.split(" ").includes(CALENDAR_READ_SCOPE));
+  return Boolean(tokens?.scope?.split(" ").includes(CALENDAR_SCOPE));
 }
 
 function isFresh(expiresAt: number | undefined, now: Date): boolean {
@@ -83,8 +83,10 @@ export async function resolveAccessToken(
   return { ok: true, accessToken: renewed.accessToken };
 }
 
-/** Reads the session cookie of the request and returns a Google access token. */
-export async function getGoogleAccessToken(request: Request): Promise<AccessTokenResult> {
+/** Anything that carries the session cookie: a request, or the headers of a page render. */
+export type CookieSource = Request | { headers: Headers };
+
+export async function getGoogleAccessToken(request: CookieSource): Promise<AccessTokenResult> {
   const secret = process.env.AUTH_SECRET;
   // The cookie name depends on whether the app is served over HTTPS.
   const session =

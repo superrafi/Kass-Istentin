@@ -26,6 +26,20 @@ describe("parseChatRequest", () => {
     });
   });
 
+  it("accepts pictures on user messages, also without text", () => {
+    const image = { mediaType: "image/png", data: "iVBORw0KGgo=" };
+    expect(parseChatRequest({ messages: [{ role: "user", content: "", images: [image] }] })).toEqual({
+      ok: true,
+      messages: [{ role: "user", content: "(Bild)", images: [image] }],
+    });
+  });
+
+  it("drops pictures on assistant messages", () => {
+    const image = { mediaType: "image/png", data: "iVBORw0KGgo=" };
+    const result = parseChatRequest({ messages: [user("a"), { ...assistant("b"), images: [image] }, user("c")] });
+    expect(result.ok && result.messages[1]).toEqual({ role: "assistant", content: "b" });
+  });
+
   it.each([
     ["no body", null],
     ["no messages", {}],
@@ -36,6 +50,10 @@ describe("parseChatRequest", () => {
     ["two user messages in a row", { messages: [user("a"), user("b"), user("c")] }],
     ["system role", { messages: [{ role: "system", content: "a" }] }],
     ["blank content", { messages: [user("  ")] }],
+    ["an unsupported image type", { messages: [{ ...user("a"), images: [{ mediaType: "image/svg+xml", data: "AAAA" }] }] }],
+    ["image data that is not base64", { messages: [{ ...user("a"), images: [{ mediaType: "image/png", data: "data:image/png;base64,AAAA" }] }] }],
+    ["too many images", { messages: [{ ...user("a"), images: Array.from({ length: 5 }, () => ({ mediaType: "image/png", data: "AAAA" })) }] }],
+    ["an image that is too large", { messages: [{ ...user("a"), images: [{ mediaType: "image/png", data: "A".repeat(7_000_004) }] }] }],
     ["non-text content", { messages: [{ role: "user", content: [] }] }],
     ["too long", { messages: [user("x".repeat(MAX_MESSAGE_LENGTH + 1))] }],
     [

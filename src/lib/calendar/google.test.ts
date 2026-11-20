@@ -1,5 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
-import { CalendarAccessError, type GoogleEvent, listEvents, normalizeEvent } from "./google";
+import {
+  CalendarAccessError,
+  deleteEvent,
+  getEvent,
+  type GoogleEvent,
+  insertBlocker,
+  listEvents,
+  normalizeEvent,
+} from "./google";
 
 const TZ = "Europe/Zurich";
 const timed: GoogleEvent = {
@@ -139,5 +147,69 @@ describe("listEvents", () => {
   it("gives up instead of answering from half a calendar", async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockImplementation(async () => json({ items: [], nextPageToken: "more" }));
     await expect(listEvents("t", period, TZ, fetchImpl)).rejects.toMatchObject({ problem: "unavailable" });
+  });
+});
+
+describe("writing", () => {
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+
+  it("creates a blocker that is busy, silent and linked to its process", async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(json({ id: "new-1" }));
+    const id = await insertBlocker(
+      "token-1",
+      {
+        title: "Blocker Retraite",
+        start: new Date("2026-11-23T09:00:00Z"),
+        end: new Date("2026-11-23T10:00:00Z"),
+        processId: "p1",
+        description: "Angelegt von Kass-Istentin.",
+      },
+      fetchImpl,
+    );
+
+    expect(id).toBe("new-1");
+    const [, init] = fetchImpl.mock.calls[0]!;
+    expect(init?.method).toBe("POST");
+    expect(JSON.parse(String(init?.body))).toEqual({
+      summary: "Blocker Retraite",
+      description: "Angelegt von Kass-Istentin.",
+      start: { dateTime: "2026-11-23T09:00:00.000Z" },
+      end: { dateTime: "2026-11-23T10:00:00.000Z" },
+      transparency: "opaque",
+      reminders: { useDefault: false },
+      extendedProperties: { private: { kassVorgang: "p1" } },
+    });
+  });
+
+  it("reports missing write access when creating", async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(json({}, 403));
+    await expect(
+      insertBlocker("t", { title: "x", start: new Date(0), end: new Date(1), processId: "p", description: "" }, fetchImpl),
+    ).rejects.toMatchObject({ problem: "notConnected" });
+  });
+
+  it("loads one entry and returns null for missing or cancelled ones", async () => {
+    const found = vi.fn<typeof fetch>().mockResolvedValue(json(timed));
+    expect((await getEvent("t", "a1", TZ, found))?.id).toBe("a1");
+    expect(String(found.mock.calls[0]![0])).toContain("/events/a1?");
+
+    const missing = vi.fn<typeof fetch>().mockResolvedValue(json({}, 404));
+    expect(await getEvent("t", "a1", TZ, missing)).toBeNull();
+    const cancelled = vi.fn<typeof fetch>().mockResolvedValue(json({ ...timed, status: "cancelled" }));
+    expect(await getEvent("t", "a1", TZ, cancelled)).toBeNull();
+  });
+
+  it("deletes an entry without notifying anyone and accepts that it is already gone", async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 204 }));
+    await deleteEvent("t", "a 1", fetchImpl);
+    const [url, init] = fetchImpl.mock.calls[0]!;
+    expect(String(url)).toContain("/events/a%201?sendUpdates=none");
+    expect(init?.method).toBe("DELETE");
+
+    const gone = vi.fn<typeof fetch>().mockResolvedValue(json({}, 410));
+    await expect(deleteEvent("t", "a1", gone)).resolves.toBeUndefined();
+    const failing = vi.fn<typeof fetch>().mockResolvedValue(json({}, 500));
+    await expect(deleteEvent("t", "a1", failing)).rejects.toBeInstanceOf(CalendarAccessError);
   });
 });
