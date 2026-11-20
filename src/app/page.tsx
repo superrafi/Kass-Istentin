@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
 import { Chat } from "@/components/Chat";
@@ -16,6 +17,7 @@ export default async function HomePage() {
             await signOut({ redirectTo: "/login" });
           }}
         >
+          <Link href="/slots">Slot-Suche</Link>
           <span className="who">{session.user.name ?? session.user.email}</span>
           <button type="submit" className="quiet">
             Abmelden

@@ -143,13 +143,7 @@ gcloud run deploy kass-istentin --source . --region europe-west6
 
 Danach einmal abmelden und neu anmelden. Google fragt dabei nach dem Zugriff auf die Kalendertermine. Ohne neue Anmeldung meldet die App «nicht verbunden».
 
-Die Slot-Suche lässt sich ohne Sprachmodell prüfen, angemeldet im Browser:
-
-```
-https://kass-istentin-PROJEKTNUMMER.europe-west6.run.app/api/slots?from=2026-11-23&to=2026-11-27&duration=45&count=3&earliest=09:00&avoidLunch=1
-```
-
-Weitere Angaben: `mode=onsite` für Termine vor Ort, `latest=17:00` für die späteste Endzeit.
+Die Slot-Suche lässt sich ohne Sprachmodell prüfen: Die Seite `/slots` (im Chat oben der Link «Slot-Suche») hat ein Formular und zeigt die Vorschläge und pro Tag, was besetzt ist. Dieselben Daten liefert `/api/slots` als JSON.
 
 Umfragen prüfen und Blocker eintragen geht nur über den Chat und braucht den Schlüssel für die Claude-API.
 

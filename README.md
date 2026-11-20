@@ -69,7 +69,7 @@ Blocker, die die Assistentin anlegt, markiert sie im Kalendereintrag mit der Ken
 | `src/lib/calendar/` | Kalender lesen und Blocker schreiben über die Google Calendar API |
 | `src/lib/google/` | Google-Zugriff erneuern |
 | `src/lib/time/` | Rechnen mit Ortszeit und Sommerzeit |
-| `src/app/` | Seiten und Schnittstellen (`/`, `/login`, `/api/chat`, `/api/slots`, `/api/proposals/confirm`, `/api/health`) |
+| `src/app/` | Seiten und Schnittstellen (`/`, `/login`, `/slots`, `/api/chat`, `/api/slots`, `/api/proposals/confirm`, `/api/health`) |
 | `src/components/` | Chat-Oberfläche und Vorschlagskarte |
 | `Dockerfile` | Image für Cloud Run |
 

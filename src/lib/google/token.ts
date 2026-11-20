@@ -83,8 +83,10 @@ export async function resolveAccessToken(
   return { ok: true, accessToken: renewed.accessToken };
 }
 
-/** Reads the session cookie of the request and returns a Google access token. */
-export async function getGoogleAccessToken(request: Request): Promise<AccessTokenResult> {
+/** Anything that carries the session cookie: a request, or the headers of a page render. */
+export type CookieSource = Request | { headers: Headers };
+
+export async function getGoogleAccessToken(request: CookieSource): Promise<AccessTokenResult> {
   const secret = process.env.AUTH_SECRET;
   // The cookie name depends on whether the app is served over HTTPS.
   const session =

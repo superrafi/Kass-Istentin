@@ -281,3 +281,99 @@ button.quiet {
   background: var(--surface);
   line-height: 1.4;
 }
+
+a {
+  color: var(--accent);
+}
+
+.page {
+  height: auto;
+  min-height: 100dvh;
+  padding-bottom: 32px;
+}
+
+.page h2 {
+  font-size: 1.05rem;
+  margin: 24px 0 8px;
+}
+
+.page main > .hint {
+  margin-top: 16px;
+}
+
+.slot-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin: 12px 0 8px;
+}
+
+.slot-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.slot-form label.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  padding-bottom: 0.5rem;
+}
+
+.slot-form input:not([type="checkbox"]),
+.slot-form select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  min-width: 0;
+}
+
+.slot-list {
+  margin: 0;
+  padding-left: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.slot-list .hint,
+.slot-list .alert {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  text-align: left;
+  vertical-align: top;
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+td:first-child {
+  white-space: nowrap;
+}
