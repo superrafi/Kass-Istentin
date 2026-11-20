@@ -59,27 +59,23 @@ Rechte für Kalender und Mail kommen erst in Schritt 2 von Etappe 1 dazu. Bis da
 
 ## 4. Secrets ablegen
 
-Jeder Befehl liest den Wert von der Eingabe, damit er nicht im Verlauf der Shell landet. Tippe den Wert ein und schliesse mit Enter und Ctrl-D ab.
+Der Schlüssel für die Sitzung ist ein Zufallswert und geht direkt in den Secret Manager:
 
 ```bash
-gcloud secrets create auth-secret --data-file=-
+openssl rand -base64 33 | tr -d '\n' | gcloud secrets create auth-secret --data-file=-
+```
+
+Die beiden anderen Werte fügst Du ein. Der Befehl wartet ohne Anzeige auf die Eingabe: Wert einfügen, Enter drücken. So landet der Wert weder im Verlauf der Shell noch mit einem Zeilenumbruch am Ende im Secret.
+
+```bash
+read -rs VALUE && printf '%s' "$VALUE" | gcloud secrets create auth-google-secret --data-file=-; unset VALUE
 ```
 
 ```bash
-gcloud secrets create auth-google-secret --data-file=-
+read -rs VALUE && printf '%s' "$VALUE" | gcloud secrets create anthropic-api-key --data-file=-; unset VALUE
 ```
 
-```bash
-gcloud secrets create anthropic-api-key --data-file=-
-```
-
-Für `auth-secret` nimmst Du einen neuen Zufallswert, nicht den lokalen:
-
-```bash
-openssl rand -base64 33
-```
-
-Solange Du keinen Claude-Schlüssel hast, lässt Du `anthropic-api-key` weg und streichst ihn im Deploy-Befehl aus `--set-secrets`.
+Solange Du keinen Claude-Schlüssel hast, lässt Du `anthropic-api-key` weg und streichst ihn in Schritt 5 aus der Schleife und im Deploy-Befehl aus `--set-secrets`.
 
 ## 5. Dienstkonto
 
