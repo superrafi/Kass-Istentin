@@ -2,7 +2,7 @@
 
 Eine Assistentin für organisatorische Aufgaben rund um Kalender und Mail. Sie wird mit Google Calendar und Gmail eines Google-Workspace-Kontos verbunden und übernimmt Terminkoordination: freie Slots suchen, Blocker für Terminumfragen eintragen und wieder aufräumen, Antworten auf Terminanfragen entwerfen.
 
-**Stand:** Schritt 1 von Etappe 1 ist gebaut: Login mit Google, Chat-Oberfläche und die Vorbereitung für Cloud Run. Die App ist noch nicht bereitgestellt und greift noch nicht auf Kalender oder Mail zu. Die Einrichtung steht in [docs/einrichtung.md](docs/einrichtung.md).
+**Stand:** Schritt 1 von Etappe 1 ist gebaut: Login mit Google, Chat-Oberfläche und die Vorbereitung für Cloud Run. Die App läuft auf Cloud Run, der Google-Login ist geprüft. Sie greift noch nicht auf Kalender oder Mail zu, und der Chat antwortet mit einem Platzhalter, bis ein Schlüssel für die Claude-API hinterlegt ist. Die Einrichtung steht in [docs/einrichtung.md](docs/einrichtung.md).
 
 Die Abläufe wurden mit den Claude-Konnektoren für Google Calendar und Gmail an echten Fällen ausprobiert. Die Ergebnisse stehen in [docs/regeln.md](docs/regeln.md).
 
@@ -78,6 +78,5 @@ npm test
 
 ## Offen
 
-- GCP-Projekt in der Cloud-Organisation anlegen, die Anmeldung als interne App einrichten und die App bereitstellen, siehe [docs/einrichtung.md](docs/einrichtung.md).
 - Schlüssel für die Claude-API und für Google Maps.
 - Startwerte für die Liste bekannter Orte. Sie gehören in die Datenbank, nicht in dieses Repository.
